@@ -1,12 +1,10 @@
-# Create T3 App
+# T3 Stack Project with Prisma and Bun
 
-This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
+This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app` and enhanced to work seamlessly with [Bun](https://bun.sh/).
 
-## What's next? How do I make an app with this?
+## What's Included?
 
-We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
-
-If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
+This project utilizes the following technologies:
 
 - [Next.js](https://nextjs.org)
 - [NextAuth.js](https://next-auth.js.org)
@@ -15,15 +13,127 @@ If you are not familiar with the different technologies used in this project, pl
 - [Tailwind CSS](https://tailwindcss.com)
 - [tRPC](https://trpc.io)
 
+## Getting Started
+
+### **Install Bun on macOS**
+
+1. Open your terminal.
+2. Run the following command to install Bun:
+   ```bash
+   curl -fsSL https://bun.sh/install | bash
+   ```
+3. Add Bun to your PATH (if not automatically added):
+   ```bash
+   export PATH="$HOME/.bun/bin:$PATH"
+   ```
+4. Verify the installation:
+   ```bash
+   bun --version
+   ```
+
+### **Install Dependencies**
+
+1. Clone this repository:
+   ```bash
+   git clone https://github.com/your-username/your-repository.git
+   cd your-repository
+   ```
+2. Install dependencies using Bun:
+   ```bash
+   bun install
+   ```
+
+### **Configure Environment Variables**
+
+Create a `.env` file in the root of the project and configure your database and other necessary variables:
+
+```env
+DATABASE_URL="your-database-url"
+NEXTAUTH_SECRET="your-secret"
+```
+
+## Prisma Commands with Bun
+
+Here are all the Prisma commands you may need during development:
+
+- **Generate Prisma Client**
+  ```bash
+  bun run prisma:generate
+  ```
+  This will generate the Prisma Client based on your schema.
+
+- **Run Migrations in Development**
+  ```bash
+  bun run prisma:migrate-dev
+  ```
+  Applies migrations to your development database.
+
+- **Deploy Migrations in Production**
+  ```bash
+  bun run prisma:migrate-deploy
+  ```
+  Deploys all pending migrations to the production database.
+
+- **Push Schema to Database**
+  ```bash
+  bun run prisma:push
+  ```
+  Syncs the Prisma schema with your database without creating migrations.
+
+- **Open Prisma Studio**
+  ```bash
+  bun run prisma:studio
+  ```
+  Launches Prisma Studio to explore and manipulate your data visually.
+
+### **Add the Commands to `package.json`**
+
+To simplify running these commands, add them to the `scripts` section of your `package.json`:
+
+```json
+{
+  "scripts": {
+    "prisma:generate": "prisma generate",
+    "prisma:migrate-dev": "prisma migrate dev",
+    "prisma:migrate-deploy": "prisma migrate deploy",
+    "prisma:push": "prisma db push",
+    "prisma:studio": "prisma studio"
+  }
+}
+```
+
+You can then run them using:
+```bash
+bun run prisma:generate
+```
+
+## Development
+
+- Start the development server:
+  ```bash
+  bun dev
+  ```
+
+- Lint the code:
+  ```bash
+  bun run lint
+  ```
+
+- Build the project:
+  ```bash
+  bun run build
+  ```
+
 ## Learn More
 
-To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
+To learn more about the T3 Stack and its components, check out the following resources:
 
-- [Documentation](https://create.t3.gg/)
-- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
+- [T3 Stack Documentation](https://create.t3.gg/)
+- [Prisma Documentation](https://prisma.io/docs)
+- [Bun Documentation](https://bun.sh/docs)
+- [Next.js Documentation](https://nextjs.org/docs)
 
-You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
+## Deployment
 
-## How do I deploy this?
+Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify), or [Docker](https://create.t3.gg/en/deployment/docker).
 
-Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
