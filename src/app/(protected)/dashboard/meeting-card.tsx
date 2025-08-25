@@ -50,27 +50,45 @@ const MeetingCard = () => {
         // 50mb
         maxSize: 50000000,
         onDrop: async (acceptedFiles) => {
-            if (!project) return;
+            if (!project) {
+                console.error('No project selected')
+                toast.error('No project selected. Please select a project first.')
+                return;
+            }
             setIsUploading(true);
             try {
                 const file = acceptedFiles[0];
                 if (file instanceof File) {
+                    console.log('Uploading file:', file.name, 'to project:', project.id)
                     const downloadUrl = await uploadFileToFirebase(file, file.name, setProgress);
+                    console.log('File uploaded to Firebase:', downloadUrl)
+                    
                     const meeting = await uploadMeeting.mutateAsync({
                         audio_url: downloadUrl,
                         name: file.name,
                         projectId: project.id,
                     })
+                    console.log('Meeting created:', meeting)
+                    
                     refetch()
                     router.push("/meetings");
-                    processMeeting.mutateAsync({
-                        audio_url: downloadUrl,
-                        projectId: project.id,
-                        meetingId: meeting.id,
-                    })
+                    
+                    toast.promise(
+                        processMeeting.mutateAsync({
+                            audio_url: downloadUrl,
+                            projectId: project.id,
+                            meetingId: meeting.id,
+                        }),
+                        {
+                            loading: 'Processing meeting...',
+                            success: 'Meeting processed successfully!',
+                            error: 'Failed to process meeting'
+                        }
+                    )
                 }
             } catch (error) {
-                console.error(error);
+                console.error('Upload error:', error);
+                toast.error('Failed to upload meeting')
             } finally {
                 setIsUploading(false);
             }
@@ -96,12 +114,17 @@ const MeetingCard = () => {
                             Powered by AI.
                         </p>
                         <div className="mt-6">
-                            <Button isLoading={isUploading}>
+                            <Button disabled={!project} isLoading={isUploading}>
                                 <Upload className="-ml-0.5 mr-1.5 h-5 w-5" aria-hidden="true" />
                                 Upload Meeting
                                 <input className="hidden" {...getInputProps()} />
                             </Button>
                         </div>
+                        {!project && (
+                            <p className="mt-2 text-xs text-red-500">
+                                Please select a project first
+                            </p>
+                        )}
                     </>
                 )}
                 {isUploading && (
