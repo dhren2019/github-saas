@@ -1,6 +1,7 @@
 import "@/styles/globals.css";
 import TopLoader from "@/components/top-loader";
 import { Toaster } from "sonner";
+import ClerkProviderClient from "@/components/clerk-provider-client";
 
 import { GeistSans } from "geist/font/sans";
 import { type Metadata } from "next";
@@ -18,14 +19,11 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <ClerkProvider>
-      <html lang="en" className={`${GeistSans.variable}`}>
-        <body>
-          <TopLoader />
-          <TRPCReactProvider>{children}</TRPCReactProvider>
-          <Toaster richColors />
-        </body>
-      </html>
-    </ClerkProvider>
+    <html lang="en" className={`${GeistSans.variable}`}>
+      <body>
+        {/* Keep client-only providers inside body so the <html> element stays server-rendered */}
+        <ClerkProviderClient>{children}</ClerkProviderClient>
+      </body>
+    </html>
   );
 }
