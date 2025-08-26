@@ -6,13 +6,13 @@ import { initializeApp } from "firebase/app";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-    apiKey: "AIzaSyBL_kflc1NIEj8LwhK9Zb2b8FOwxPrvjKk",
-    authDomain: "dionysus-68f20.firebaseapp.com",
-    projectId: "dionysus-68f20",
-    // Firebase Storage bucket should be in the form <project-id>.appspot.com
-    storageBucket: "dionysus-68f20.appspot.com",
-    messagingSenderId: "613136820353",
-    appId: "1:613136820353:web:fb6ed0a0bed45fda558580"
+    apiKey: "AIzaSyDDoVl4tgC1xBQlcvoOuv_vmDhYWQD7nQw",
+    authDomain: "github-saas-d6499.firebaseapp.com",
+    projectId: "github-saas-d6499",
+    storageBucket: "github-saas-d6499.firebasestorage.app",
+    messagingSenderId: "1003676191648",
+    appId: "1:1003676191648:web:126201a61101dfd191b2c5",
+    measurementId: "G-LST0W25197"
 };
 
 // Initialize Firebase

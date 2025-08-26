@@ -22,6 +22,12 @@ export async function POST(req: NextRequest) {
     try {
         const body = await req.json();
         const { audio_url, projectId, meetingId } = bodyParser.parse(body);
+        // mark meeting as processing immediately
+        try {
+            await db.meeting.update({ where: { id: meetingId }, data: { status: 'PROCESSING' } })
+        } catch (err) {
+            console.error('Failed to set meeting to PROCESSING', err)
+        }
         // get the transcript and summaries
         const { transcript, summaries } = await processMeeting(audio_url);
 
@@ -39,9 +45,10 @@ export async function POST(req: NextRequest) {
         }))
 
         const limit = pLimit(10);
-        // save the embeddings
-        await Promise.all(embeddings.map(async (embedding, index) => {
-            limit(async () => {
+        // save the embeddings (ensure we return the promises from limit so Promise.all waits)
+        const savePromises = embeddings.map((embedding) => {
+            return limit(async () => {
+                console.log('Creating MeetingEmbedding record for meeting:', meetingId?.toString?.() ?? meetingId)
                 const meetingEmbedding = await db.meetingEmbedding.create({
                     data: {
                         meetingId,
@@ -49,13 +56,15 @@ export async function POST(req: NextRequest) {
                     }
                 })
 
+                // store vector using raw SQL (Postgres vector extension)
                 await db.$executeRaw`
-        UPDATE "MeetingEmbedding"
-        SET "embedding" = ${embedding.embedding}::vector
-        WHERE id = ${meetingEmbedding.id}`;
-
+                    UPDATE "MeetingEmbedding"
+                    SET "embedding" = ${embedding.embedding}::vector
+                    WHERE id = ${meetingEmbedding.id}`;
             })
-        }))
+        })
+
+        await Promise.all(savePromises)
 
         // save the issues
         await db.issue.createMany({
@@ -81,7 +90,14 @@ export async function POST(req: NextRequest) {
         if (error instanceof z.ZodError) {
             return NextResponse.json({ error: error.issues }, { status: 400 })
         }
-
+        console.error('process-meeting failed', error)
+        // try to set meeting as PROCESSING failed -> set to PROCESSING to indicate something went wrong
+        try {
+            // keep the meeting in PROCESSING or you could add a FAILED enum later
+            await db.meeting.update({ where: { id: (await req.json()).meetingId }, data: { status: 'PROCESSING' } })
+        } catch (e) {
+            console.error('Failed to update meeting status after error', e)
+        }
         return NextResponse.json({ error: "Internal Server Error" }, { status: 500 })
     }
 }

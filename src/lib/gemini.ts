@@ -14,6 +14,10 @@ export const getEmbeddings = async (text: string) => {
 
     const result = await model.embedContent(text);
     const embedding = result.embedding;
+    if (!embedding || !Array.isArray(embedding.values)) {
+        console.error('Invalid embedding result from Gemini', { result })
+        throw new Error('Invalid embedding result from Gemini')
+    }
     return embedding.values as number[];
 }
 

@@ -37,22 +37,5 @@ export const processMeeting = async (audio_url: string) => {
 
 };
 
+// Example usage commented out to avoid running on module import
 // processMeeting(FILE_URL);
-const fileUrl = '/Users/elliott/Downloads/lob.mp3'
-
-const transcript = await client.transcripts.transcribe({
-    // audio_url: fileUrl,
-    audio: readFileSync(fileUrl),
-    auto_chapters: true,
-    language_code: 'en',
-});
-
-await writeFileSync('transcript.json', JSON.stringify(transcript, null, 2))
-
-// const summaries = transcript.chapters?.map(chapter => ({
-//     start: msToTime(chapter.start),
-//     end: msToTime(chapter.end),
-//     gist: chapter.gist,
-//     headline: chapter.headline,
-//     summary: chapter.summary
-// })) || [];
