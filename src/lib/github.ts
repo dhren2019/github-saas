@@ -77,6 +77,52 @@ export const pollRepo = async (projectId: string) => {
     return commits;
 };
 
+export const createPullRequest = async (githubUrl: string, githubToken: string, data: {
+    title: string;
+    body: string;
+    head: string;
+    base: string;
+}) => {
+    const [owner, repo] = githubUrl.split("/").slice(3, 5);
+    if (!owner || !repo) {
+        throw new Error("Invalid github url");
+    }
+
+    const authenticatedOctokit = new Octokit({
+        auth: githubToken
+    });
+
+    const { data: pullRequest } = await authenticatedOctokit.rest.pulls.create({
+        owner,
+        repo,
+        title: data.title,
+        body: data.body,
+        head: data.head,
+        base: data.base,
+    });
+
+    return pullRequest;
+};
+
+export const getBranches = async (githubUrl: string, githubToken?: string) => {
+    const [owner, repo] = githubUrl.split("/").slice(3, 5);
+    if (!owner || !repo) {
+        throw new Error("Invalid github url");
+    }
+
+    const octokitClient = githubToken ? new Octokit({ auth: githubToken }) : octokit;
+
+    const { data } = await octokitClient.rest.repos.listBranches({
+        owner,
+        repo,
+    });
+
+    return data.map(branch => ({
+        name: branch.name,
+        commit: branch.commit.sha
+    }));
+};
+
 async function fetchProjectGitHubUrl(projectId: string) {
     const project = await db.project.findUnique({
         where: {

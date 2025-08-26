@@ -6,6 +6,7 @@ import React from 'react'
 import AskQuestionCard from './ask-question-card'
 import CommitLog from './commit-log'
 import MeetingCard from './meeting-card'
+import CreatePullRequestCard from './create-pull-request-card'
 import ArchiveButton from './archive-button'
 import InviteButton from './invite-button'
 import TeamMembers from './team-members'
@@ -44,6 +45,7 @@ const DashboardPage = () => {
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-5">
                     <AskQuestionCard />
                     <MeetingCard />
+                    <CreatePullRequestCard />
                 </div>
             </div>
             <div className="mt-8">

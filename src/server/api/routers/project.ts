@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
-import { pollRepo } from "@/lib/github";
+import { pollRepo, createPullRequest, getBranches } from "@/lib/github";
 import { checkCredits, indexGithubRepo, loadGithubRepo } from "@/lib/github-loader";
 
 export const projectRouter = createTRPCRouter({
@@ -103,4 +103,40 @@ export const projectRouter = createTRPCRouter({
   getStripeTransactions: protectedProcedure.query(async ({ ctx }) => {
     return await ctx.db.stripeTransaction.findMany({ where: { userId: ctx.user.userId! } });
   }),
+  
+  getBranches: protectedProcedure
+    .input(z.object({ projectId: z.string(), githubToken: z.string().optional() }))
+    .query(async ({ ctx, input }) => {
+      const project = await ctx.db.project.findUnique({
+        where: { id: input.projectId },
+        select: { githubUrl: true }
+      });
+      if (!project?.githubUrl) throw new Error("Project not found");
+      
+      return await getBranches(project.githubUrl, input.githubToken);
+    }),
+
+  createPullRequest: protectedProcedure
+    .input(z.object({
+      projectId: z.string(),
+      githubToken: z.string().min(1),
+      title: z.string().min(1),
+      body: z.string(),
+      head: z.string().min(1),
+      base: z.string().min(1),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const project = await ctx.db.project.findUnique({
+        where: { id: input.projectId },
+        select: { githubUrl: true }
+      });
+      if (!project?.githubUrl) throw new Error("Project not found");
+      
+      return await createPullRequest(project.githubUrl, input.githubToken, {
+        title: input.title,
+        body: input.body,
+        head: input.head,
+        base: input.base,
+      });
+    }),
 });
